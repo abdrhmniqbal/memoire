@@ -52,22 +52,22 @@ class HomeLayout extends HookWidget {
 
     return Scaffold(
       floatingActionButton: floatingActionButton,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex.value,
-        onDestinationSelected: (index) {
-          currentIndex.value = index;
-          context.router.replace(navigationItems[index].route);
-        },
-        destinations:
-            navigationItems
-                .map(
-                  (item) => NavigationDestination(
-                    icon: Icon(item.icon),
-                    label: item.label,
-                  ),
-                )
-                .toList(),
-      ),
+      // bottomNavigationBar: NavigationBar(
+      //   selectedIndex: currentIndex.value,
+      //   onDestinationSelected: (index) {
+      //     currentIndex.value = index;
+      //     context.router.replace(navigationItems[index].route);
+      //   },
+      //   destinations:
+      //       navigationItems
+      //           .map(
+      //             (item) => NavigationDestination(
+      //               icon: Icon(item.icon),
+      //               label: item.label,
+      //             ),
+      //           )
+      //           .toList(),
+      // ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(

@@ -1,10 +1,11 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memoire/config/router/routes.dart';
 import 'package:memoire/config/themes/themes.dart';
 
 void main() {
-  runApp(const App());
+  runApp(ProviderScope(child: App()));
 }
 
 class App extends StatelessWidget {

@@ -1,0 +1,69 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:memoire/domain/models/bookmark.dart';
+import 'package:memoire/config/themes/themes.dart';
+import 'package:memoire/utils/string.dart';
+
+class BookmarkListItem extends ConsumerWidget {
+  const BookmarkListItem({super.key, required this.bookmark});
+  final Bookmark bookmark;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = context.theme;
+
+    return ListTile(
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.secondaryContainer,
+          shape: BoxShape.circle,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child:
+              bookmark.favicon != null
+                  ? ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: bookmark.favicon!,
+                      fit: BoxFit.cover,
+                      placeholder:
+                          (context, url) => CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: theme.colorScheme.onSecondaryContainer,
+                          ),
+                      errorWidget:
+                          (context, url, error) => Icon(
+                            Icons.broken_image_outlined,
+                            size: 24,
+                            color: theme.colorScheme.onSecondaryContainer,
+                          ),
+                    ),
+                  )
+                  : Icon(
+                    Icons.language_outlined,
+                    size: 24,
+                    color: theme.colorScheme.onSecondaryContainer,
+                  ),
+        ),
+      ),
+      title: Text(
+        bookmark.title ?? bookmark.url,
+        style: theme.textTheme.titleMedium,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        '${getHost(bookmark.url)} • ${DateFormat('dd/MM/yyyy').format(bookmark.updatedAt!)}',
+        maxLines: 1,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.primary,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}

@@ -1,0 +1,23 @@
+/* Table Definitions */
+-- Bookmarks Table
+CREATE TABLE IF NOT EXISTS [bookmarks] (
+   [id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+   [title] TEXT,
+   [description] TEXT,
+   [url] TEXT NOT NULL,
+   [favicon] TEXT,
+   [image_url] TEXT, 
+   [created_at] INTEGER DEFAULT (unixepoch()),
+   [updated_at] INTEGER DEFAULT (unixepoch())
+);
+
+/* Function Definitions */
+_getAllBookmarks: 
+    SELECT * FROM [bookmarks];
+_createBookmark:
+    INSERT INTO [bookmarks] (title, description, url, favicon, image_url)
+    VALUES (:title, :description, :url, :favicon, :image_url);
+_getBookmarkById:
+    SELECT * FROM [bookmarks]
+    WHERE id = :id
+    LIMIT 1;
