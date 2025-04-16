@@ -1,7 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 import 'package:memoire/domain/models/bookmark.dart';
 import 'package:memoire/config/themes/themes.dart';
 import 'package:memoire/utils/string.dart';
@@ -14,7 +17,59 @@ class BookmarkListItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = context.theme;
 
+    void _showBookmarkActions(BuildContext context) {
+      WoltModalSheet.show(
+        context: context,
+        pageListBuilder: (modalSheetContext) {
+          return [
+            WoltModalSheetPage(
+              hasTopBarLayer: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.copy_outlined),
+                    title: const Text('Copy Link'),
+                    subtitle: Text(bookmark.url),
+                    onTap: () async {
+                      await Clipboard.setData(
+                        ClipboardData(text: bookmark.url),
+                      );
+                      Navigator.of(modalSheetContext).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Link copied to clipboard.'),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.open_in_browser_outlined),
+                    title: const Text('Open Link'),
+                    onTap: () async {
+                      if (await canLaunchUrl(Uri.parse(bookmark.url))) {
+                        await launchUrl(Uri.parse(bookmark.url));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Could not open browser.'),
+                          ),
+                        );
+                      }
+                      Navigator.of(modalSheetContext).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ];
+        },
+        modalTypeBuilder: (context) => WoltModalType.dialog(),
+      );
+    }
+
     return ListTile(
+      onTap: () => _showBookmarkActions(context),
       leading: Container(
         width: 40,
         height: 40,

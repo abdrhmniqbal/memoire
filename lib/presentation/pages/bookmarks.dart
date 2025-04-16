@@ -25,7 +25,7 @@ class BookmarksPage extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsetsDirectional.symmetric(
-          horizontal: 8,
+          horizontal: 4,
           vertical: 0,
         ),
         child: bookmarks.when(
