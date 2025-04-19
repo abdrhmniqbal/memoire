@@ -4,6 +4,8 @@
   
   ### Full-featured bookmark manager
   Manage your bookmarks – easier than ever on your Android device.
+  
+  (Currently on early stage development)
 
   ## Features
 
