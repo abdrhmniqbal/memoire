@@ -16,13 +16,13 @@ class NavigationItem {
 }
 
 class HomeLayout extends HookWidget {
-  final Widget body;
+  final List<Widget> slivers;
   final List<Widget>? actions;
   final Widget? floatingActionButton;
 
   const HomeLayout({
     super.key,
-    required this.body,
+    required this.slivers,
     this.actions,
     this.floatingActionButton,
   });
@@ -52,22 +52,22 @@ class HomeLayout extends HookWidget {
 
     return Scaffold(
       floatingActionButton: floatingActionButton,
-      // bottomNavigationBar: NavigationBar(
-      //   selectedIndex: currentIndex.value,
-      //   onDestinationSelected: (index) {
-      //     currentIndex.value = index;
-      //     context.router.replace(navigationItems[index].route);
-      //   },
-      //   destinations:
-      //       navigationItems
-      //           .map(
-      //             (item) => NavigationDestination(
-      //               icon: Icon(item.icon),
-      //               label: item.label,
-      //             ),
-      //           )
-      //           .toList(),
-      // ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: currentIndex.value,
+        onDestinationSelected: (index) {
+          currentIndex.value = index;
+          context.router.replace(navigationItems[index].route);
+        },
+        destinations:
+            navigationItems
+                .map(
+                  (item) => NavigationDestination(
+                    icon: Icon(item.icon),
+                    label: item.label,
+                  ),
+                )
+                .toList(),
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
@@ -77,7 +77,12 @@ class HomeLayout extends HookWidget {
             title: const Text('Memoire'),
             actions: <Widget>[if (actions != null) ...actions!],
           ),
-          SliverFillRemaining(child: body),
+          ...slivers,
+          SliverPadding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom + 80,
+            ),
+          ),
         ],
       ),
     );

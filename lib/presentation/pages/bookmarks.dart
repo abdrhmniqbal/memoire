@@ -8,6 +8,7 @@ import 'package:memoire/presentation/widgets/add_bookmark_dialog.dart';
 import 'package:memoire/presentation/widgets/bookmark_list_item.dart';
 
 @RoutePage()
+@RoutePage()
 class BookmarksPage extends ConsumerWidget {
   const BookmarksPage({super.key});
 
@@ -23,29 +24,36 @@ class BookmarksPage extends ConsumerWidget {
         tooltip: 'Add bookmark',
         child: const Icon(Icons.add),
       ),
-      body: Padding(
-        padding: const EdgeInsetsDirectional.symmetric(
-          horizontal: 4,
-          vertical: 0,
-        ),
-        child: bookmarks.when(
+      slivers: [
+        bookmarks.when(
           data: (data) {
             if (data.isEmpty) {
-              return const Center(child: Text('No bookmarks found.'));
+              return const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: Text('No bookmarks found.')),
+              );
             }
-            return ListView.builder(
-              padding: const EdgeInsets.only(),
-              itemCount: data.length,
-              itemBuilder:
-                  (context, index) => BookmarkListItem(bookmark: data[index]),
+            return SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: BookmarkListItem(bookmark: data[index]),
+                );
+              }, childCount: data.length),
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading:
+              () => const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: CircularProgressIndicator()),
+              ),
           error:
-              (error, stackTrace) =>
-                  Center(child: Text('Error: ${error.toString()}')),
+              (error, _) => SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: Text('Error: ${error.toString()}')),
+              ),
         ),
-      ),
+      ],
     );
   }
 }
