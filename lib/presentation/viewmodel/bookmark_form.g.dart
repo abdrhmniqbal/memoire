@@ -7,7 +7,7 @@ part of 'bookmark_form.dart';
 // **************************************************************************
 
 String _$bookmarkFormViewModelHash() =>
-    r'bca03c2192b4069cda2a51456c4f1b5472530b8c';
+    r'1d32f0afc565b86ad438b4116368751791cd3330';
 
 /// Copied from Dart SDK
 class _SystemHash {
