@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:memoire/domain/models/bookmark.dart';
 import 'package:memoire/domain/usecases/create_bookmark.dart';
+import 'package:memoire/domain/usecases/delete_bookmark.dart';
 import 'package:memoire/domain/usecases/get_bookmark_list.dart';
 
 part 'bookmark_list.g.dart';
@@ -31,5 +32,9 @@ class BookmarkListViewModel extends _$BookmarkListViewModel {
         imageUrl,
       ).future,
     );
+  }
+
+  Future<void> deleteBookmark(final int id) async {
+    return ref.watch(deleteBookmarkUseCaseProvider(id).future);
   }
 }

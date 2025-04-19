@@ -24,7 +24,6 @@ class BookmarksRepository extends _$BookmarksRepository {
   }) async {
     final model = await database.createBookmark(
       db.BookmarksCompanion.insert(
-        // Menggunakan 'db.BookmarksCompanion'
         title: Value(title),
         description: Value(description),
         url: url,
@@ -33,5 +32,9 @@ class BookmarksRepository extends _$BookmarksRepository {
       ),
     );
     return BookmarkMapper.transformToModel(model);
+  }
+
+  Future<void> deleteBookmark(int id) async {
+    await database.deleteBookmark(id);
   }
 }

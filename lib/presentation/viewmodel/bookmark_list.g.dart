@@ -7,7 +7,7 @@ part of 'bookmark_list.dart';
 // **************************************************************************
 
 String _$bookmarkListViewModelHash() =>
-    r'99f61a4b6b25b7b41c4df8eaa1561122d08aafcd';
+    r'37f15f9947228304ac13e27632bb8ba80ad51ba5';
 
 /// See also [BookmarkListViewModel].
 @ProviderFor(BookmarkListViewModel)

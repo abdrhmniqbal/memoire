@@ -21,3 +21,6 @@ _getBookmarkById:
     SELECT * FROM [bookmarks]
     WHERE id = :id
     LIMIT 1;
+_deleteBookmark:
+    DELETE FROM [bookmarks]
+    WHERE id = :id;

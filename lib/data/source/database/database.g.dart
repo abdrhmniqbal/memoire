@@ -558,6 +558,15 @@ abstract class _$Database extends GeneratedDatabase {
     ).asyncMap(bookmarks.mapFromRow);
   }
 
+  Future<int> _deleteBookmark(int id) {
+    return customUpdate(
+      'DELETE FROM bookmarks WHERE id = ?1',
+      variables: [Variable<int>(id)],
+      updates: {bookmarks},
+      updateKind: UpdateKind.delete,
+    );
+  }
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

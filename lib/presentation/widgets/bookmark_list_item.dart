@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:memoire/presentation/viewmodel/bookmark_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 import 'package:memoire/domain/models/bookmark.dart';
@@ -16,55 +17,79 @@ class BookmarkListItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = context.theme;
+    final viewModel = ref.read(bookmarkListViewModelProvider.notifier);
 
     void _showBookmarkActions(BuildContext context) {
+      final navigator = Navigator.of(context);
+      final messenger = ScaffoldMessenger.of(context);
+
+      void _closeWith(VoidCallback callback) {
+        navigator.pop();
+        callback();
+      }
+
+      final actions = [
+        {
+          'icon': Icons.copy_outlined,
+          'title': 'Copy Link',
+          'onTap':
+              () => _closeWith(() async {
+                await Clipboard.setData(ClipboardData(text: bookmark.url));
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('Link copied to clipboard.')),
+                );
+              }),
+        },
+        {
+          'icon': Icons.open_in_browser_outlined,
+          'title': 'Open Link',
+          'onTap':
+              () => _closeWith(() async {
+                final uri = Uri.parse(bookmark.url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                } else {
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Could not open browser.')),
+                  );
+                }
+              }),
+        },
+        {
+          'icon': Icons.delete_outline,
+          'title': 'Delete Bookmark',
+          'onTap':
+              () => _closeWith(() async {
+                await viewModel.deleteBookmark(bookmark.id!);
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('Bookmark deleted.')),
+                );
+              }),
+        },
+      ];
+
       WoltModalSheet.show(
         context: context,
-        pageListBuilder: (modalSheetContext) {
-          return [
-            WoltModalSheetPage(
-              hasTopBarLayer: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.copy_outlined),
-                    title: const Text('Copy Link'),
-                    subtitle: Text(bookmark.url),
-                    onTap: () async {
-                      await Clipboard.setData(
-                        ClipboardData(text: bookmark.url),
-                      );
-                      Navigator.of(modalSheetContext).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Link copied to clipboard.'),
-                        ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.open_in_browser_outlined),
-                    title: const Text('Open Link'),
-                    onTap: () async {
-                      if (await canLaunchUrl(Uri.parse(bookmark.url))) {
-                        await launchUrl(Uri.parse(bookmark.url));
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Could not open browser.'),
-                          ),
-                        );
-                      }
-                      Navigator.of(modalSheetContext).pop();
-                    },
-                  ),
-                ],
+        pageListBuilder:
+            (modalSheetContext) => [
+              WoltModalSheetPage(
+                hasTopBarLayer: false,
+                child: ListView(
+                  shrinkWrap: true,
+                  children:
+                      actions
+                          .map(
+                            (action) => ListTile(
+                              leading: Icon(action['icon'] as IconData),
+                              title: Text(action['title'] as String),
+                              onTap: action['onTap'] as VoidCallback,
+                            ),
+                          )
+                          .toList(),
+                ),
               ),
-            ),
-          ];
-        },
-        modalTypeBuilder: (context) => WoltModalType.dialog(),
+            ],
+        modalTypeBuilder: (_) => WoltModalType.dialog(),
       );
     }
 

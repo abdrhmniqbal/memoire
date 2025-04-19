@@ -46,4 +46,6 @@ class Database extends _$Database {
 
   Future<Bookmark?> getBookmarkById(int id) =>
       _getBookmarkById(id).getSingleOrNull();
+  
+  Future<void> deleteBookmark(int id) => _deleteBookmark(id);
 }
