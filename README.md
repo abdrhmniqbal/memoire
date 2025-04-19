@@ -1,16 +1,16 @@
-# myapp
+<div align="center">
 
-A new Flutter project.
+  # [Memoire](#)
+  
+  ### Full-featured bookmark manager
+  Manage your bookmarks – easier than ever on your Android device.
 
-## Getting Started
+  ## Features
 
-This project is a starting point for a Flutter application.
+<div align="left">
 
-A few resources to get you started if this is your first Flutter project:
+* Manage bookmark
+* Plus much more...
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+</div>
+</div>
