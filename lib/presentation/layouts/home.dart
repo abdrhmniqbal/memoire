@@ -29,45 +29,10 @@ class HomeLayout extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentIndex = useState(0);
     final theme = context.theme;
-
-    final List<NavigationItem> navigationItems = [
-      NavigationItem(
-        label: 'Bookmarks',
-        icon: Icons.bookmarks_outlined,
-        route: const NamedRoute("BookmarksView"),
-      ),
-      NavigationItem(
-        label: 'Collections',
-        icon: Icons.collections_bookmark_outlined,
-        route: const NamedRoute("CollectionsView"),
-      ),
-      NavigationItem(
-        label: 'Search',
-        icon: Icons.search_outlined,
-        route: const NamedRoute("SearchView"),
-      ),
-    ];
 
     return Scaffold(
       floatingActionButton: floatingActionButton,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex.value,
-        onDestinationSelected: (index) {
-          currentIndex.value = index;
-          context.router.replace(navigationItems[index].route);
-        },
-        destinations:
-            navigationItems
-                .map(
-                  (item) => NavigationDestination(
-                    icon: Icon(item.icon),
-                    label: item.label,
-                  ),
-                )
-                .toList(),
-      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
