@@ -134,7 +134,6 @@ typedef TextFieldBuilder =
 
 class _TextField extends StatefulWidget {
   const _TextField({
-    super.key,
     required this.value,
     required this.label,
     required this.onChanged,

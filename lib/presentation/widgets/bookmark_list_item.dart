@@ -10,6 +10,67 @@ import 'package:memoire/domain/models/bookmark.dart';
 import 'package:memoire/config/themes/themes.dart';
 import 'package:memoire/utils/string.dart';
 
+class _BookmarkAction {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final VoidCallback onTap;
+  final Widget? trailing;
+
+  _BookmarkAction({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    required this.onTap,
+    this.trailing,
+  });
+}
+
+class ActionTile extends StatelessWidget {
+  final _BookmarkAction action;
+  final BorderRadius? borderRadius;
+
+  const ActionTile({super.key, required this.action, this.borderRadius});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: action.onTap,
+      borderRadius: borderRadius,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: borderRadius ?? BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(action.icon, size: 20, color: theme.colorScheme.onSurface),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(action.title, style: theme.textTheme.bodyMedium),
+                  if (action.subtitle != null)
+                    Text(
+                      action.subtitle!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.outline,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (action.trailing != null) action.trailing!,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class BookmarkListItem extends ConsumerWidget {
   const BookmarkListItem({super.key, required this.bookmark});
   final Bookmark bookmark;
@@ -22,74 +83,106 @@ class BookmarkListItem extends ConsumerWidget {
     void _showBookmarkActions(BuildContext context) {
       final navigator = Navigator.of(context);
       final messenger = ScaffoldMessenger.of(context);
+      final viewModel = ref.read(bookmarkListViewModelProvider.notifier);
 
-      void _closeWith(VoidCallback callback) {
+      void close(VoidCallback cb) {
         navigator.pop();
-        callback();
+        cb();
       }
 
-      final actions = [
-        {
-          'icon': Icons.copy_outlined,
-          'title': 'Copy Link',
-          'onTap':
-              () => _closeWith(() async {
+      final actions = <_BookmarkAction>[
+        _BookmarkAction(
+          icon: Icons.copy_outlined,
+          title: 'Copy link',
+          subtitle: bookmark.url,
+          onTap:
+              () => close(() async {
                 await Clipboard.setData(ClipboardData(text: bookmark.url));
                 messenger.showSnackBar(
                   const SnackBar(content: Text('Link copied to clipboard.')),
                 );
               }),
-        },
-        {
-          'icon': Icons.open_in_browser_outlined,
-          'title': 'Open Link',
-          'onTap':
-              () => _closeWith(() async {
+        ),
+        _BookmarkAction(
+          icon: Icons.open_in_browser_outlined,
+          title: 'Open in browser',
+          onTap:
+              () => close(() async {
                 final uri = Uri.parse(bookmark.url);
                 if (await canLaunchUrl(uri)) {
                   await launchUrl(uri);
                 } else {
                   messenger.showSnackBar(
-                    const SnackBar(content: Text('Could not open browser.')),
+                    const SnackBar(
+                      content: Text('Could not open link in browser.'),
+                    ),
                   );
                 }
               }),
-        },
-        {
-          'icon': Icons.delete_outline,
-          'title': 'Delete Bookmark',
-          'onTap':
-              () => _closeWith(() async {
+        ),
+        _BookmarkAction(
+          icon: Icons.delete_outline,
+          title: 'Delete bookmark',
+          onTap:
+              () => close(() async {
                 await viewModel.deleteBookmark(bookmark.id!);
                 messenger.showSnackBar(
                   const SnackBar(content: Text('Bookmark deleted.')),
                 );
               }),
-        },
+        ),
       ];
 
       WoltModalSheet.show(
         context: context,
+        modalTypeBuilder: (_) => WoltModalType.dialog(),
         pageListBuilder:
-            (modalSheetContext) => [
+            (_) => [
               WoltModalSheetPage(
                 hasTopBarLayer: false,
-                child: ListView(
-                  shrinkWrap: true,
-                  children:
-                      actions
-                          .map(
-                            (action) => ListTile(
-                              leading: Icon(action['icon'] as IconData),
-                              title: Text(action['title'] as String),
-                              onTap: action['onTap'] as VoidCallback,
-                            ),
-                          )
-                          .toList(),
+                child: Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceVariant,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(actions.length, (index) {
+                      final action = actions[index];
+                      final isFirst = index == 0;
+                      final isLast = index == actions.length - 1;
+
+                      final borderRadius = BorderRadius.only(
+                        topLeft:
+                            isFirst
+                                ? const Radius.circular(16)
+                                : Radius.circular(4),
+                        topRight:
+                            isFirst
+                                ? const Radius.circular(16)
+                                : Radius.circular(4),
+                        bottomLeft:
+                            isLast
+                                ? const Radius.circular(16)
+                                : Radius.circular(4),
+                        bottomRight:
+                            isLast
+                                ? const Radius.circular(16)
+                                : Radius.circular(4),
+                      );
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        child: ActionTile(
+                          action: action,
+                          borderRadius: borderRadius,
+                        ),
+                      );
+                    }),
+                  ),
                 ),
               ),
             ],
-        modalTypeBuilder: (_) => WoltModalType.dialog(),
       );
     }
 
