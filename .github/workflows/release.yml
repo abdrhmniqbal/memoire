@@ -1,0 +1,139 @@
+name: "Release"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build & Release
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get commit message and determine release type
+        id: check_release
+        run: |
+          msg=$(git log -1 --pretty=%B | tr -d '\r')
+          echo "Commit message: $msg"
+          echo "COMMIT_MESSAGE=$msg" >> $GITHUB_ENV
+          
+          if [[ "$msg" == "chore: release preview" ]]; then
+            echo "IS_RELEASE=true" >> $GITHUB_ENV
+            echo "IS_PREVIEW=true" >> $GITHUB_ENV
+          elif [[ "$msg" == "chore: release" ]]; then
+            echo "IS_RELEASE=true" >> $GITHUB_ENV
+            echo "IS_PREVIEW=false" >> $GITHUB_ENV
+          else
+            echo "Not a release commit. Skipping build and release steps."
+            echo "IS_RELEASE=false" >> $GITHUB_ENV
+          fi
+
+      - name: Stop if not a release commit
+        if: env.IS_RELEASE != 'true'
+        run: echo "Skipping rest of job as it's not a release commit."
+
+      - name: Set Up Java
+        if: env.IS_RELEASE == 'true'
+        uses: actions/setup-java@v3.12.0
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+
+      - name: Set Up Flutter
+        if: env.IS_RELEASE == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version-file: pubspec.yaml
+
+      - name: Install Dependencies
+        if: env.IS_RELEASE == 'true'
+        run: flutter pub get
+
+      - name: Decode Keystore
+        if: env.IS_RELEASE == 'true'
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+
+      - name: Create key.properties
+        if: env.IS_RELEASE == 'true'
+        run: |
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=keystore.jks" >> android/key.properties
+
+      - name: Build APK
+        if: env.IS_RELEASE == 'true'
+        run: flutter build apk --release
+
+      - name: Extract version from pubspec.yaml
+        if: env.IS_RELEASE == 'true'
+        id: extract_version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+
+      - name: Rename APKs by architecture
+        if: env.IS_RELEASE == 'true'
+        run: |
+          mkdir -p renamed-apks
+          for file in build/app/outputs/flutter-apk/*.apk; do
+            name=$(basename "$file")
+            case $name in
+              app-arm64-v8a-release.apk)
+                cp "$file" "renamed-apks/memoire-arm64-v8a-v${{ env.VERSION }}.apk"
+                ;;
+              app-armeabi-v7a-release.apk)
+                cp "$file" "renamed-apks/memoire-armeabi-v7a-v${{ env.VERSION }}.apk"
+                ;;
+              app-x86_64-release.apk)
+                cp "$file" "renamed-apks/memoire-x86_64-v${{ env.VERSION }}.apk"
+                ;;
+              app-x86-release.apk)
+                cp "$file" "renamed-apks/memoire-x86-v${{ env.VERSION }}.apk"
+                ;;
+              app-release.apk)
+                cp "$file" "renamed-apks/memoire-v${{ env.VERSION }}.apk"
+                ;;
+              *)
+                echo "Skipping unknown APK: $name"
+                ;;
+            esac
+          done
+
+      - name: Check if Tag Exists
+        if: env.IS_RELEASE == 'true'
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+      - name: Modify Tag if Already Exists
+        if: env.IS_RELEASE == 'true' && env.TAG_EXISTS == 'true'
+        run: |
+          new_version="${{ env.VERSION }}-build-${{ github.run_number }}"
+          echo "VERSION=$new_version" >> $GITHUB_ENV
+
+      - name: Upload Artifacts
+        if: env.IS_RELEASE == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Releases
+          path: renamed-apks/*.apk
+
+      - name: Create GitHub Release
+        if: env.IS_RELEASE == 'true'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "renamed-apks/*.apk"
+          tag: v${{ env.VERSION }}
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          prerelease: ${{ env.IS_PREVIEW == 'true' }}
