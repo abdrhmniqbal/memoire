@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="./.github/assets/logo.png" alt="Memoire logo" title="Memoire logo" width="80"/>
 
   # [Memoire](#)
   
