@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:memoire/presentation/viewmodel/bookmark_form.dart';
 import 'package:memoire/presentation/widgets/forms.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddBookmarkDialog extends HookConsumerWidget {
   const AddBookmarkDialog({super.key});
@@ -13,6 +14,7 @@ class AddBookmarkDialog extends HookConsumerWidget {
     final viewModel = ref.read(bookmarkFormViewModelProvider(null).notifier);
     final formState = ref.watch(bookmarkFormViewModelProvider(null));
     final url = formState['url'] ?? '';
+    final t = AppLocalizations.of(context)!;
 
     Future<void> handleAddBookmark() async {
       if (isLoading.value) return;
@@ -22,13 +24,9 @@ class AddBookmarkDialog extends HookConsumerWidget {
         await viewModel.createBookmark();
         if (context.mounted) Navigator.of(context).pop();
         if (!metadata && context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'There are problem while fetching metadata, use default data instead.',
-              ),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(t.fetchFailedMessage)));
         }
       } catch (e) {
         if (context.mounted) {
@@ -43,15 +41,17 @@ class AddBookmarkDialog extends HookConsumerWidget {
     }
 
     return AlertDialog(
-      title: const Text('Add Bookmark'),
+      title: Text(t.addItem(t.bookmark)),
       content: StringFormField(
-        label: 'Enter bookmark link',
+        label: t.inputMessage(t.link.toLowerCase()),
         placeholder: 'https://',
         value: url,
         onChanged: viewModel.setUrl,
         validator:
             (value) =>
-                (value == null || value.isEmpty) ? 'URL is required' : null,
+                (value == null || value.isEmpty)
+                    ? t.requiredMessage(t.link)
+                    : null,
       ),
       actions: [
         Column(
@@ -67,12 +67,12 @@ class AddBookmarkDialog extends HookConsumerWidget {
                         height: 24,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                      : const Text('Add'),
+                      : Text(t.add),
             ),
             TextButton(
               onPressed:
                   isLoading.value ? null : () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(t.cancel),
             ),
           ],
         ),

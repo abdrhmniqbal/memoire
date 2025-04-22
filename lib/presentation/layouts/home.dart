@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:memoire/config/themes/themes.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NavigationItem {
   final String label;
@@ -29,7 +29,8 @@ class HomeLayout extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.theme;
+    final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       floatingActionButton: floatingActionButton,
@@ -39,7 +40,7 @@ class HomeLayout extends HookWidget {
             pinned: true,
             automaticallyImplyLeading: true,
             backgroundColor: theme.colorScheme.surface,
-            title: const Text('Memoire'),
+            title: Text(t.appTitle),
             actions: <Widget>[if (actions != null) ...actions!],
           ),
           ...slivers,

@@ -1,0 +1,19 @@
+{
+    "@@locale": "en",
+    "appTitle": "Memoire",
+    "add": "Add",
+    "cancel": "Cancel",
+    "bookmark": "Bookmark",
+    "link": "Link",
+    "addItem": "Add {item}",
+    "deleteItem": "Delete {item}",
+    "deleteItemSuccess": "{item} deleted.",
+    "copyLink": "Copy link",
+    "copyLinkSuccess": "Link copied to clipboard.",
+    "openInBrowser": "Open in browser",
+    "openInBrowserFail": "There are problem while opening browser.",
+    "noItemFound": "No {item} found.",
+    "inputMessage": "Input {item} here",
+    "requiredMessage": "{item} is required.",
+    "fetchFailedMessage": "There are problem while fetching metadata, use default data instead."
+}

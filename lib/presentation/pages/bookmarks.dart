@@ -6,6 +6,7 @@ import 'package:memoire/presentation/layouts/home.dart';
 import 'package:memoire/presentation/viewmodel/bookmark_list.dart';
 import 'package:memoire/presentation/widgets/add_bookmark_dialog.dart';
 import 'package:memoire/presentation/widgets/bookmark_list_item.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 @RoutePage()
 @RoutePage()
@@ -15,22 +16,25 @@ class BookmarksPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bookmarks = ref.watch(bookmarkListViewModelProvider);
+    final t = AppLocalizations.of(context)!;
 
     return HomeLayout(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showAddBookmarkDialog(context);
         },
-        tooltip: 'Add bookmark',
+        tooltip: t.addItem(t.bookmark.toLowerCase()),
         child: const Icon(Icons.add),
       ),
       slivers: [
         bookmarks.when(
           data: (data) {
             if (data.isEmpty) {
-              return const SliverFillRemaining(
+              return SliverFillRemaining(
                 hasScrollBody: false,
-                child: Center(child: Text('No bookmarks found.')),
+                child: Center(
+                  child: Text(t.noItemFound(t.bookmark.toLowerCase())),
+                ),
               );
             }
             return SliverList(

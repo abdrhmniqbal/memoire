@@ -7,8 +7,8 @@ import 'package:memoire/presentation/viewmodel/bookmark_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 import 'package:memoire/domain/models/bookmark.dart';
-import 'package:memoire/config/themes/themes.dart';
 import 'package:memoire/utils/string.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class _BookmarkAction {
   final IconData icon;
@@ -41,7 +41,7 @@ class ActionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: borderRadius ?? BorderRadius.circular(8),
         ),
         child: Row(
@@ -77,13 +77,13 @@ class BookmarkListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = context.theme;
+    final theme = Theme.of(context);
+    final t = AppLocalizations.of(context)!;
     final viewModel = ref.read(bookmarkListViewModelProvider.notifier);
 
-    void _showBookmarkActions(BuildContext context) {
+    void showBookmarkActions(BuildContext context) {
       final navigator = Navigator.of(context);
       final messenger = ScaffoldMessenger.of(context);
-      final viewModel = ref.read(bookmarkListViewModelProvider.notifier);
 
       void close(VoidCallback cb) {
         navigator.pop();
@@ -93,19 +93,19 @@ class BookmarkListItem extends ConsumerWidget {
       final actions = <_BookmarkAction>[
         _BookmarkAction(
           icon: Icons.copy_outlined,
-          title: 'Copy link',
+          title: t.copyLink,
           subtitle: bookmark.url,
           onTap:
               () => close(() async {
                 await Clipboard.setData(ClipboardData(text: bookmark.url));
                 messenger.showSnackBar(
-                  const SnackBar(content: Text('Link copied to clipboard.')),
+                  SnackBar(content: Text(t.copyLinkSuccess)),
                 );
               }),
         ),
         _BookmarkAction(
           icon: Icons.open_in_browser_outlined,
-          title: 'Open in browser',
+          title: t.openInBrowser,
           onTap:
               () => close(() async {
                 final uri = Uri.parse(bookmark.url);
@@ -113,21 +113,19 @@ class BookmarkListItem extends ConsumerWidget {
                   await launchUrl(uri);
                 } else {
                   messenger.showSnackBar(
-                    const SnackBar(
-                      content: Text('Could not open link in browser.'),
-                    ),
+                    SnackBar(content: Text(t.openInBrowserFail)),
                   );
                 }
               }),
         ),
         _BookmarkAction(
           icon: Icons.delete_outline,
-          title: 'Delete bookmark',
+          title: t.deleteItem(t.bookmark.toLowerCase()),
           onTap:
               () => close(() async {
-                await viewModel.deleteBookmark(bookmark.id!);
+                await viewModel.deleteBookmark(bookmark.id);
                 messenger.showSnackBar(
-                  const SnackBar(content: Text('Bookmark deleted.')),
+                  SnackBar(content: Text(t.deleteItemSuccess(t.bookmark))),
                 );
               }),
         ),
@@ -142,9 +140,7 @@ class BookmarkListItem extends ConsumerWidget {
                 hasTopBarLayer: false,
                 child: Container(
                   padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceVariant,
-                  ),
+                  decoration: BoxDecoration(color: theme.colorScheme.surface),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(actions.length, (index) {
@@ -187,7 +183,7 @@ class BookmarkListItem extends ConsumerWidget {
     }
 
     return ListTile(
-      onTap: () => _showBookmarkActions(context),
+      onTap: () => showBookmarkActions(context),
       leading: Container(
         width: 40,
         height: 40,

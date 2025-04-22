@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memoire/config/router/routes.dart';
 import 'package:memoire/config/themes/themes.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
   runApp(ProviderScope(child: App()));
@@ -16,12 +17,14 @@ class App extends StatelessWidget {
     return DynamicColorBuilder(
       builder: (lightColorScheme, darkColorScheme) {
         return MaterialApp.router(
-          title: 'Memoire',
+          onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
           theme: AppTheme.light(lightColorScheme),
           darkTheme: AppTheme.dark(darkColorScheme),
           themeMode: ThemeMode.system,
           routerDelegate: appRouter.delegate(),
           routeInformationParser: appRouter.defaultRouteParser(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
         );
       },
     );
