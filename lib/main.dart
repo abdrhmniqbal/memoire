@@ -6,6 +6,7 @@ import 'package:memoire/config/themes/themes.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(ProviderScope(child: App()));
 }
 

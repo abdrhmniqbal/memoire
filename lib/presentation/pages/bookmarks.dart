@@ -7,6 +7,7 @@ import 'package:memoire/presentation/viewmodel/bookmark_list.dart';
 import 'package:memoire/presentation/widgets/add_bookmark_dialog.dart';
 import 'package:memoire/presentation/widgets/bookmark_list_item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memoire/presentation/widgets/menu.dart';
 
 @RoutePage()
 @RoutePage()
@@ -19,6 +20,9 @@ class BookmarksPage extends ConsumerWidget {
     final t = AppLocalizations.of(context)!;
 
     return HomeLayout(
+      actions: [
+        Menu(items: [...mainMenuItems]),
+      ],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showAddBookmarkDialog(context);
