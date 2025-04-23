@@ -6,6 +6,7 @@
     "bookmark": "Bookmark",
     "link": "Link",
     "addItem": "Add {item}",
+    "addBookmarkDescription": "Enter a valid link to save as a bookmark.",
     "deleteItem": "Delete {item}",
     "deleteItemSuccess": "{item} deleted.",
     "copyLink": "Copy link",
