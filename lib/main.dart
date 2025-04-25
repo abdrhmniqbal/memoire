@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memoire/config/router/routes.dart';
 import 'package:memoire/config/themes/themes.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memoire/config/i18n/app_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

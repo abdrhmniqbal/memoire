@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 import 'package:memoire/domain/models/bookmark.dart';
 import 'package:memoire/utils/string.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memoire/config/i18n/app_localizations.dart';
 
 class _BookmarkAction {
   final IconData icon;

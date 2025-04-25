@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memoire/config/i18n/app_localizations.dart';
 
 class NavigationItem {
   final String label;
@@ -16,12 +16,14 @@ class NavigationItem {
 }
 
 class HomeLayout extends HookWidget {
+  final String title;
   final List<Widget> slivers;
   final List<Widget>? actions;
   final Widget? floatingActionButton;
 
   const HomeLayout({
     super.key,
+    required this.title,
     required this.slivers,
     this.actions,
     this.floatingActionButton,
@@ -40,7 +42,7 @@ class HomeLayout extends HookWidget {
             pinned: true,
             automaticallyImplyLeading: true,
             backgroundColor: theme.colorScheme.surface,
-            title: Text(t.appTitle),
+            title: Text(title),
             actions: <Widget>[if (actions != null) ...actions!],
           ),
           ...slivers,
